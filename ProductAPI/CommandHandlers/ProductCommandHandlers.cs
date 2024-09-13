@@ -12,12 +12,14 @@ namespace ProductAPI.CommandHandlers
         IRequestHandler<DeleteProductCommand>
     {
         private readonly IMapper _mapper;
-        private readonly ProductAbstractRepositories _productRepository;
+        private readonly IProductReadRepository _productReadRepository;
+        private readonly IProductWriteRepository _productWriteRepository;
 
-        public ProductCommandHandlers(IMapper mapper, ProductAbstractRepositories productRepository)
+        public ProductCommandHandlers(IMapper mapper, IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository)
         {
             _mapper = mapper;
-            _productRepository = productRepository;
+            _productReadRepository = productReadRepository;
+            _productWriteRepository = productWriteRepository;
         }
 
         public async Task Handle(AddProductCommand command, CancellationToken cancellationToken)
@@ -25,26 +27,25 @@ namespace ProductAPI.CommandHandlers
             var product = _mapper.Map<Product>(command);
             product.Id = Guid.NewGuid();
 
-            await _productRepository.Add(product, cancellationToken);
-
-            return Unit.Value;
+            await _productWriteRepository.Add(product, cancellationToken);
         }
 
-        public async Task<Unit> Handle(UpdateProductCommand query, CancellationToken cancellationToken)
+        public async Task Handle(UpdateProductCommand command, CancellationToken cancellationToken)
         {
-            var productExisting = await _productRepository.Get(query.Id, cancellationToken);;
+            _ = await _productReadRepository.Get(command.Id, cancellationToken)
+                 ?? throw new Exception("Product not found");
 
-            await _productRepository.Update(product, cancellationToken);
+            var product = _mapper.Map<Product>(command);
 
-            return Unit.Value;
+            await _productWriteRepository.Update(product, cancellationToken);
         }
 
-        public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteProductCommand command, CancellationToken cancellationToken)
         {
+            var productExisting = await _productReadRepository.Get(command.Id, cancellationToken)
+                ?? throw new Exception("Product not found");
 
-            await _productRepository.Delete(request.Id);
-
-            return Unit.Value;
+            await _productWriteRepository.Delete(command.Id, cancellationToken);
         }
     }
 }

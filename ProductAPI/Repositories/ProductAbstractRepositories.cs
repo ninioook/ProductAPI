@@ -13,6 +13,8 @@ namespace ProductAPI.Repositories
 
     public interface IProductReadRepository
     {
+        Task<IEnumerable<Product>> GetAll(CancellationToken cancellationToken);
 
+        Task<Product> Get(string id, CancellationToken cancellationToken);
     }
 }
