@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ProductAPI.Commands;
+using ProductAPI.Entities;
 using ProductAPI.Models;
 
 namespace ProductAPI.AutoMapppers
@@ -10,6 +11,8 @@ namespace ProductAPI.AutoMapppers
         {
             CreateMap<AddProductModel, AddProductCommand>();
             CreateMap<UpdateProductModel, UpdateProductCommand>();
+            CreateMap<AddProductCommand, Product>();
+            CreateMap<UpdateProductModel, Product>();
         }
     }
 }

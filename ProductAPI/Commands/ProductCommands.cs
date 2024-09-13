@@ -15,7 +15,7 @@ namespace ProductAPI.Commands
 
     public class UpdateProductCommand : IRequest
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -28,6 +28,6 @@ namespace ProductAPI.Commands
 
     public class DeleteProductCommand : IRequest
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
     }
 }
