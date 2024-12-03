@@ -1,20 +1,25 @@
-﻿using ProductAPI.Entities;
+﻿using ProductAPI.Dtos;
+using ProductAPI.Entities;
 
 namespace ProductAPI.Repositories
 {
     public interface IProductWriteRepository
     {
-        Task Add(Product product, CancellationToken cancellationToken);
+        Task Add(Product product, IEnumerable<int> categoryIds);
 
-        Task Update(Product product, CancellationToken cancellationToken);
+        Task Update(Product product, IEnumerable<int> categoryIds);
 
-        Task Delete(string id, CancellationToken cancellationToken);
+        Task Delete(int id);
     }
 
     public interface IProductReadRepository
     {
-        Task<IEnumerable<Product>> GetAll(CancellationToken cancellationToken);
+        Task<IEnumerable<Product>> GetAllProducts();
 
-        Task<Product> Get(string id, CancellationToken cancellationToken);
+        Task<Product> Get(int id);
+
+        Task<IEnumerable<ProductCategoryListItemDto>> GetAllProductCategories();
+
+        Task<IEnumerable<string>> GetProductCategoriesById(int productId);
     }
 }

@@ -19,7 +19,7 @@ namespace ProductAPI.Models
     public class UpdateProductModel
     {
         [Required]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -36,6 +36,6 @@ namespace ProductAPI.Models
     public class DeleteProductModel
     {
         [Required]
-        public string Id { get; set; }
+        public int Id { get; set; }
     }
 }

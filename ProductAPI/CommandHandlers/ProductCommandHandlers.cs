@@ -3,6 +3,7 @@ using MediatR;
 using ProductAPI.Commands;
 using ProductAPI.Entities;
 using ProductAPI.Repositories;
+using ILogger = Serilog.ILogger;
 
 namespace ProductAPI.CommandHandlers
 {
@@ -12,12 +13,14 @@ namespace ProductAPI.CommandHandlers
         IRequestHandler<DeleteProductCommand>
     {
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
         private readonly IProductReadRepository _productReadRepository;
         private readonly IProductWriteRepository _productWriteRepository;
 
-        public ProductCommandHandlers(IMapper mapper, IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository)
+        public ProductCommandHandlers(IMapper mapper, ILogger logger, IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository)
         {
             _mapper = mapper;
+            _logger = logger;
             _productReadRepository = productReadRepository;
             _productWriteRepository = productWriteRepository;
         }
@@ -25,27 +28,26 @@ namespace ProductAPI.CommandHandlers
         public async Task Handle(AddProductCommand command, CancellationToken cancellationToken)
         {
             var product = _mapper.Map<Product>(command);
-            product.Id = Guid.NewGuid();
 
-            await _productWriteRepository.Add(product, cancellationToken);
+            await _productWriteRepository.Add(product, command.CategoryIds);
         }
 
         public async Task Handle(UpdateProductCommand command, CancellationToken cancellationToken)
         {
-            _ = await _productReadRepository.Get(command.Id, cancellationToken)
-                 ?? throw new Exception("Product not found");
+            _ = await _productReadRepository.Get(command.Id)
+                ?? throw new Exception("Product not found");
 
             var product = _mapper.Map<Product>(command);
 
-            await _productWriteRepository.Update(product, cancellationToken);
+            await _productWriteRepository.Update(product, command.CategoryIds);
         }
 
         public async Task Handle(DeleteProductCommand command, CancellationToken cancellationToken)
         {
-            var productExisting = await _productReadRepository.Get(command.Id, cancellationToken)
+            var productExisting = await _productReadRepository.Get(command.Id)
                 ?? throw new Exception("Product not found");
 
-            await _productWriteRepository.Delete(command.Id, cancellationToken);
+            await _productWriteRepository.Delete(command.Id);
         }
     }
 }
